@@ -35,15 +35,66 @@
   @include valo;
 
   // Insert your own theme rules here
-	.v-button-caption {
-		background: yellow;
-		margin: 10px;
+	.sideMenuButton {
+		border: none;
+		@include box-shadow(none);
+		background: transparent;
+		background-color: #58595b;   
+	    font-size: 12pt;
+	    color: white;
+	    border: none;
+	    content: nont;
+	    border-radius: 0px;
+	    background-image: none;
+	    &:hover {
+	    	background-color: #00a79d;
+    		color: white;
+	    }
+	    &:active {
+	    	@include opacity(.7);
+		    &:after {
+		    	background: transparent;
+		    }
+		}
 	}
 
-	.v-label-centerlabel {
+	.headerButton {
+		background-color: white; 
+	    color: #008CBA; 
+	    font-weight: bold;
+	    border: 2px solid #008CBA;
+	    transition-duration: 0.4s;
+	    background-image: none;
+	    &:hover {
+	    	background-color: #008CBA;
+    		color: white;
+	    }
+	}
+
+	.v-label-side_menu_title {
 		color: white;
 		text-align: center;
 		font-weight: bold;
 		font-size: 44px;
+	}
+
+	.myIssueTitle {
+		color: black;
+		text-align: left;
+		font-weight: bold;
+		font-size: 25px;
+	}
+
+	.myIssueStatus {
+		color: #575f69;
+		text-align: left;
+		font-size: 18px;
+	}
+
+	.pageNavigatorTemp {
+		color: pink;
+		text-align: center;
+		font-weight: bold;
+		font-size: 20px;
 	}
 }

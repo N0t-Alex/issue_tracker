@@ -15050,14 +15050,71 @@ div.v-layout.v-horizontal.v-widget {
 	overflow: hidden;
 }
 
-.mytheme .v-button-caption {
-	background: yellow;
-	margin: 10px;
+.mytheme .sideMenuButton {
+	border: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	background: transparent;
+	background-color: #58595b;
+	font-size: 12pt;
+	color: white;
+	border: none;
+	content: nont;
+	border-radius: 0px;
+	background-image: none;
 }
 
-.mytheme .v-label-centerlabel {
+.mytheme .sideMenuButton:hover {
+	background-color: #00a79d;
+	color: white;
+}
+
+.mytheme .sideMenuButton:active {
+	opacity: 0.7;
+	filter: alpha(opacity=70) ;
+}
+
+.mytheme .sideMenuButton:active:after {
+	background: transparent;
+}
+
+.mytheme .headerButton {
+	background-color: white;
+	color: #008CBA;
+	font-weight: bold;
+	border: 2px solid #008CBA;
+	transition-duration: 0.4s;
+	background-image: none;
+}
+
+.mytheme .headerButton:hover {
+	background-color: #008CBA;
+	color: white;
+}
+
+.mytheme .v-label-side_menu_title {
 	color: white;
 	text-align: center;
 	font-weight: bold;
 	font-size: 44px;
+}
+
+.mytheme .myIssueTitle {
+	color: black;
+	text-align: left;
+	font-weight: bold;
+	font-size: 25px;
+}
+
+.mytheme .myIssueStatus {
+	color: #575f69;
+	text-align: left;
+	font-size: 18px;
+}
+
+.mytheme .pageNavigatorTemp {
+	color: pink;
+	text-align: center;
+	font-weight: bold;
+	font-size: 20px;
 }
