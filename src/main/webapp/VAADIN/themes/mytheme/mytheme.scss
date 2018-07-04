@@ -29,6 +29,8 @@
 // For more information, see: https://vaadin.com/book/-/page/themes.valo.html
 // Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
 
+//This line clears the blue border or valo theme.
+$v-focus-style: none;
 @import "../valo/valo.scss";
 
 @mixin mytheme {
@@ -43,7 +45,7 @@
 	    font-size: 12pt;
 	    color: white;
 	    border: none;
-	    content: nont;
+	    content: none;
 	    border-radius: 0px;
 	    background-image: none;
 	    &:hover {
@@ -71,6 +73,28 @@
 	    }
 	}
 
+	.titleOnClick {
+		border: none;
+		@include box-shadow(none);
+		background: transparent;
+		background-color: transparent;   
+	    font-size: 18pt;
+	    font-weight: 700;
+	    color: black;
+	    border: none;
+	    content: none;
+	    border-radius: 0px;
+	    background-image: none;
+	    &:hover {
+    		color: blue;
+	    }
+	}
+
+	.v-button {
+		border: none;
+    	outline: none;
+	}
+
 	.v-label-side_menu_title {
 		color: white;
 		text-align: center;
@@ -89,6 +113,19 @@
 		color: #575f69;
 		text-align: left;
 		font-size: 18px;
+	}
+
+	.myCommentTitle {
+		color: black;
+		text-align: left;
+		font-weight: bold;
+		font-size: 35px;
+	}
+
+	.myCommentStatus {
+		color: #575f69;
+		text-align: left;
+		font-size: 20px;
 	}
 
 	.pageNavigatorTemp {
