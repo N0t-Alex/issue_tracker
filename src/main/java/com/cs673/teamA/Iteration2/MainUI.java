@@ -73,8 +73,8 @@ public class MainUI extends UI {
 
     //This is the rootRootLayout for adding pop up window.
     private AbsoluteLayout rootRootLayout;
-    private PopupView popupNewIssue;
-    private PopupView popupNewComment;
+    private PopupView popIssueView;
+    private PopupView popCommentView;
     private PopupView popLoginView;
 
     //Pop up window UI for CRUD on issue tickets.
@@ -139,7 +139,7 @@ public class MainUI extends UI {
         Button addComment = new Button("Add Comment");
         addComment.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
-                popupNewComment.setPopupVisible(true);
+                popCommentView.setPopupVisible(true);
             }
         });
         //Add a refresh button for "close to" real time user experience.
@@ -193,7 +193,7 @@ public class MainUI extends UI {
                 makeIssuePopupView("", "", "", "");
                 //Calling issue popup view, but not querying the database.
                 selectedIssue = Long.MIN_VALUE;
-                popupNewIssue.setPopupVisible(true);
+                popIssueView.setPopupVisible(true);
             }
         });
         issueButtonsLayout.addComponent(newIssueBtn);
@@ -259,7 +259,7 @@ public class MainUI extends UI {
                     makeIssuePopupView(issue.getName(), issue.getDescription(), "", "");
                     //Use the issue ID to query the database.
                     selectedIssue = issue.getIssueId();
-                    popupNewIssue.setPopupVisible(true);
+                    popIssueView.setPopupVisible(true);
                 }
             });
             editIssueAndCommentIcon.addComponent(editIssueButton);
@@ -545,7 +545,7 @@ public class MainUI extends UI {
                     iRepo.save(newIssue);
                     Notification.show(issueTitleText.getValue(), "is created.",
                       Notification.Type.HUMANIZED_MESSAGE);
-                    popupNewIssue.setPopupVisible(false);
+                    popIssueView.setPopupVisible(false);
                 } else {
                     //Edit an old ticket in the database.
                     IssueTicket editIssue = iRepo.findById(selectedIssue).get();
@@ -554,7 +554,7 @@ public class MainUI extends UI {
                     iRepo.save(editIssue);
                     Notification.show(issueTitleText.getValue(), "is edited.",
                       Notification.Type.HUMANIZED_MESSAGE);
-                    popupNewIssue.setPopupVisible(false);
+                    popIssueView.setPopupVisible(false);
                 }
 
                 //Reload the issue page.
@@ -568,8 +568,8 @@ public class MainUI extends UI {
         popupContent.addComponent(addIssueButton);
         popupContent.setComponentAlignment(addIssueButton, Alignment.MIDDLE_CENTER);
         // The component itself
-        popupNewIssue = new PopupView(null, popupContent);
-        popupNewIssue.setHideOnMouseOut(false);
+        popIssueView = new PopupView(null, popupContent);
+        popIssueView.setHideOnMouseOut(false);
 
         // Content for the PopupView of creating new comment.
         VerticalLayout popupContent2 = new VerticalLayout();
@@ -585,7 +585,7 @@ public class MainUI extends UI {
                 newComment.setContent(commentContentText.getValue());
                 newComment.setIssueId(selectedIssue);
                 cRepo.save(newComment);
-                popupNewComment.setPopupVisible(false);
+                popCommentView.setPopupVisible(false);
 
                 //Reload the comment board.
                 loadIssueComments(selectedIssue);
@@ -595,8 +595,8 @@ public class MainUI extends UI {
         popupContent2.addComponent(addCommentButton);
         popupContent2.setComponentAlignment(addCommentButton, Alignment.MIDDLE_CENTER);
         // The component itself
-        popupNewComment = new PopupView(null, popupContent2);
-        popupNewComment.setHideOnMouseOut(false);
+        popCommentView = new PopupView(null, popupContent2);
+        popCommentView.setHideOnMouseOut(false);
 
         // Popup View for Log in.
         VerticalLayout popLoginLayout = new VerticalLayout();
@@ -623,8 +623,8 @@ public class MainUI extends UI {
 
         rootRootLayout = new AbsoluteLayout();
         rootRootLayout.addComponent(rootLayout);
-        rootRootLayout.addComponent(popupNewIssue, "left: 50%; top: 50%;");
-        rootRootLayout.addComponent(popupNewComment, "left: 50%; top: 50%;");
+        rootRootLayout.addComponent(popIssueView, "left: 50%; top: 50%;");
+        rootRootLayout.addComponent(popCommentView, "left: 50%; top: 50%;");
         rootRootLayout.addComponent(popLoginView, "left: 50%; top: 50%;");
         setContent(rootRootLayout);  
     }
