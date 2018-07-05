@@ -181,6 +181,8 @@ public class MainUI extends UI {
             public void buttonClick(ClickEvent event) {
                 //Make empty pop up view for creating new issue ticket.
                 makeIssuePopupView("", "", "", "");
+                //Calling issue popup view, but not querying the database.
+                selectedIssue = null;
                 popupNewIssue.setPopupVisible(true);
             }
         });
@@ -245,6 +247,8 @@ public class MainUI extends UI {
                     //Pop up a window for editing issue information, show issue data in blanks.
                     //ToDo: assignee and owner is not connected to login yet.
                     makeIssuePopupView(issue.getName(), issue.getDescription(), "", "");
+                    //Use the issue ID to query the database.
+                    selectedIssue = issue.getIssueId();
                     popupNewIssue.setPopupVisible(true);
                 }
             });
@@ -458,6 +462,7 @@ public class MainUI extends UI {
                 List<User> assigneeSearch;
                 Long ownerId = null;
                 Long assigneeId = null;
+                /* ToDo: Comment these lines for now.
                 if (!ownerText.isEmpty()) {
                     ownerSearch = uRepo.findByUsernameContaining(ownerText.getValue());
                     if (ownerSearch.size() == 0) {
@@ -503,20 +508,30 @@ public class MainUI extends UI {
                 //Find the project issue counter.
                 for (int i=0; i<projects.size(); i++) {
 
+                } */
+                //Decide create new or edit old according to the value of selectedIssue.
+                if (selectedIssue == null) {
+                    //Add a new ticket to the database.
+                    IssueTicket newIssue = new IssueTicket();
+                    newIssue.setName(issueTitleText.getValue());
+                    newIssue.setDescription(issueContentText.getValue());
+                    //ToDo: code below doesn't do anything for now.
+                    newIssue.setAssigneeId(assigneeId);
+                    newIssue.setOwnerId(ownerId);
+                    newIssue.setDateCreated(new Date());
+                    newIssue.setResolved(false);
+                    newIssue.setProjectId(selectedProject);
+                    iRepo.save(newIssue);
+                    Notification.show(issueTitleText.getValue(), "is created.",
+                      Notification.Type.HUMANIZED_MESSAGE);
+                    popupNewIssue.setPopupVisible(false);
+                } else {
+                    //Edit an old ticket in the database.
+                    IssueTicket editIssue = iRepo.findById(selectedIssue).get();
+                    editIssue.setName(issueTitleText.getValue());
+                    editIssue.setDescription(issueContentText.getValue());
+                    iRepo.save(editIssue);
                 }
-                //Add the ticket to the database.
-                IssueTicket newIssue = new IssueTicket();
-                newIssue.setName(issueTitleText.getValue());
-                newIssue.setDescription(issueContentText.getValue());
-                newIssue.setAssigneeId(assigneeId);
-                newIssue.setOwnerId(ownerId);
-                newIssue.setDateCreated(new Date());
-                newIssue.setResolved(false);
-                newIssue.setProjectId(selectedProject);
-                iRepo.save(newIssue);
-                Notification.show(issueTitleText.getValue(), "is created.",
-                  Notification.Type.HUMANIZED_MESSAGE);
-                popupNewIssue.setPopupVisible(false);
 
                 //Reload the issue page.
                 loadIssueTickets(selectedProject);
@@ -531,108 +546,6 @@ public class MainUI extends UI {
         // The component itself
         popupNewIssue = new PopupView(null, popupContent);
         popupNewIssue.setHideOnMouseOut(false);
-
-        /*
-        // Content for the PopupView of creating new issue.
-        VerticalLayout popupContent = new VerticalLayout();
-        popupContent.setSizeFull();
-        TextField issueTitleText = new TextField("Issue Title");
-        issueTitleText.setWidth(300, Unit.PIXELS);
-        TextArea issueContentText = new TextArea("Issue Content");
-        issueContentText.setHeight(200, Unit.PIXELS);
-        issueContentText.setWidth(300, Unit.PIXELS);
-        TextField assigneeText = new TextField("Assignee");
-        assigneeText.setWidth(300, Unit.PIXELS);
-        TextField ownerText = new TextField("Owner");
-        ownerText.setWidth(300, Unit.PIXELS);
-        Button addIssueButton = new Button("Add");
-        addIssueButton.addClickListener(new Button.ClickListener() {
-            public void buttonClick(ClickEvent event) {
-            	//Check that the issue has a title first.
-            	if (issueTitleText.isEmpty()) {
-            		Notification.show("Issue must have a title.", Notification.Type.ERROR_MESSAGE);
-            		return;
-            	}
-        		
-            	//Search the database for users containing the entered values for owner and assignee.
-            	List<User> ownerSearch;
-            	List<User> assigneeSearch;
-            	Long ownerId = null;
-            	Long assigneeId = null;
-            	if (!ownerText.isEmpty()) {
-            		ownerSearch = uRepo.findByUsernameContaining(ownerText.getValue());
-            		if (ownerSearch.size() == 0) {
-            			Notification.show("No users found with a username containing " 
-            				+ ownerText.getValue() + ". Please try a different username.", 
-            				Notification.Type.ERROR_MESSAGE);
-            			return;
-            		}
-            		else if (ownerSearch.size() > 1) {
-            			Notification.show("More than one user was found with a username containing " 
-                				+ ownerText.getValue() + ". Please try a different username.", 
-                				Notification.Type.ERROR_MESSAGE);
-                			return;
-            		}
-            		else {
-            			ownerId = ownerSearch.get(0).getUserId();
-            		}
-            	}
-            	else {
-            		ownerId = loggedIn.get().getUserId();
-            	}
-            	if (!assigneeText.isEmpty()) {
-            		assigneeSearch = uRepo.findByUsernameContaining(assigneeText.getValue());
-            		if (assigneeSearch.size() == 0) {
-            			Notification.show("No users found with a username containing " 
-            				+ assigneeText.getValue() + ". Please try a different username.", 
-            				Notification.Type.ERROR_MESSAGE);
-            			return;
-            		}
-            		else if (assigneeSearch.size() > 1) {
-            			Notification.show("More than one user was found with a username containing " 
-                				+ assigneeText.getValue() + ". Please try a different username.", 
-                				Notification.Type.ERROR_MESSAGE);
-                			return;
-            		}
-            		else {
-            			assigneeId = assigneeSearch.get(0).getUserId();
-            		}
-            	}
-            	else {
-            		assigneeId = loggedIn.get().getUserId();
-            	}
-                //Find the project issue counter.
-                for (int i=0; i<projects.size(); i++) {
-
-                }
-            	//Add the ticket to the database.
-            	IssueTicket newIssue = new IssueTicket();
-            	newIssue.setName(issueTitleText.getValue());
-            	newIssue.setDescription(issueContentText.getValue());
-            	newIssue.setAssigneeId(assigneeId);
-            	newIssue.setOwnerId(ownerId);
-            	newIssue.setDateCreated(new Date());
-            	newIssue.setResolved(false);
-            	newIssue.setProjectId(selectedProject);
-                iRepo.save(newIssue);
-                Notification.show(issueTitleText.getValue(), "is created.",
-                  Notification.Type.HUMANIZED_MESSAGE);
-                popupNewIssue.setPopupVisible(false);
-
-                //Reload the issue page.
-                loadIssueTickets(selectedProject);
-            }
-        });
-        popupContent.addComponent(issueTitleText);
-        popupContent.addComponent(issueContentText);
-        popupContent.addComponent(assigneeText);
-        popupContent.addComponent(ownerText);
-        popupContent.addComponent(addIssueButton);
-        popupContent.setComponentAlignment(addIssueButton, Alignment.MIDDLE_CENTER);
-        // The component itself
-        popupNewIssue = new PopupView(null, popupContent);
-        popupNewIssue.setHideOnMouseOut(false);
-        */
 
         // Content for the PopupView of creating new comment.
         VerticalLayout popupContent2 = new VerticalLayout();
