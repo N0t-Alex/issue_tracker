@@ -462,7 +462,7 @@ public class MainUI extends UI {
                 List<User> assigneeSearch;
                 Long ownerId = null;
                 Long assigneeId = null;
-                /* ToDo: Comment these lines for now.
+                //ToDo: need to get this wired to the database.
                 if (!ownerText.isEmpty()) {
                     ownerSearch = uRepo.findByUsernameContaining(ownerText.getValue());
                     if (ownerSearch.size() == 0) {
@@ -508,7 +508,7 @@ public class MainUI extends UI {
                 //Find the project issue counter.
                 for (int i=0; i<projects.size(); i++) {
 
-                } */
+                }
                 //Decide create new or edit old according to the value of selectedIssue.
                 if (selectedIssue == Long.MIN_VALUE) {
                     //Add a new ticket to the database.
