@@ -6,4 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends CrudRepository<User, Long> {
 	public List<User> findByUsernameContaining(String username);
+	public User findByUsername(String username);
 }

@@ -53,6 +53,10 @@ public class MainUI extends UI {
   	
   	@Autowired
   	private UserRepository uRepo;
+
+    //!!!!!!!!!!!!!!!!!!!!THIS IS NEW!!!!!!!!!!!!!!!!!
+    @Autowired
+    private UpwRepository upwRepository;
   	
   	private List<Long> issues;
   	private List<Long> projects;
@@ -61,12 +65,17 @@ public class MainUI extends UI {
     private Long selectedIssue;
   	private List<Long> users;
   	private List<Comment> comments;
-  	private Optional<User> loggedIn;
+    //!!!!!!!!!!!!MORE NEW!!!!!!!!!!!
+    private String authToken;
+    private User loggedIn;
+    //END NEW
     
     //Define max display of dynamically added components.
     private final int MAX_PROJECTS_NUM = 5;
     private final int MAX_ISSUES_NUM = 25;
     private final int MAX_COMMENTS_NUM = 100;
+    //!!!!!!!!!!!!!!!!!NEW!!!!!!!!!!!!!!!
+    private final int MAX_STRING_LENGTH = 255;
     
     //Other layout that may be changed real time.
     private CustomLayout mainPanelLayout;
@@ -97,11 +106,25 @@ public class MainUI extends UI {
     public static class Servlet extends VaadinServlet {
     }
 
+    //!!!!!!!!!!!!!!!!!!!!NEW!!!!!!!!!!!!!!!!!!!!!!!
+    //Login functionality for authentication
+    public String login(String un, String pw) {
+        Upw u = upwRepository.findByUnAndPw(un,pw);
+        if (u != null) {
+            return SecurityTest.encrypt(u.getId());
+        }
+        else {
+            return Integer.toString(-1);
+        }
+    }
+
+    //!!!!!!!!!INCLUDE LOGIC FOR CLEARING COMMENTS!!!!!!!!!!!!!1
     private void loadIssueComments(Long issueId) {
     	IssueTicket issue = iRepo.findById(issueId).get();
-        //TODO: Reset the comments each time, consider doing it locally.
-        comments = new ArrayList<Comment>();
-        comments.addAll(cRepo.findByIssueId(issue.getIssueId()));
+        if (!comments.isEmpty()) {
+            comments.clear();
+        }
+        comments.addAll(cRepo.findByIssueId(issueId));
         CustomLayout commentsBoardContent = new CustomLayout("discussion_board");
         Label issueName = new Label(issue.getName());
         issueName.addStyleName("myCommentTitle");
@@ -358,25 +381,49 @@ public class MainUI extends UI {
     	projects = new ArrayList<Long>();
     	pRepo.findAll().forEach(project -> projects.add(project.getProjectId()));
     	
-    	//Dummy users
-    	User alex = new User();
-    	alex.setUsername("Alex Andrade");
-    	uRepo.save(alex);
-    	User iYang = new User();
-    	iYang.setUsername("I-Yang Chen");
-    	uRepo.save(iYang);
-    	
-    	users = new ArrayList<Long>();
-    	uRepo.findAll().forEach(user -> users.add(user.getUserId()));
+    	//THIS PART HAS BEEN CHANGED A LOT FOR LOGIN. PLEASE REPLACE OLD CODE.
+        //Demo users
+        if (uRepo.findByUsername("Guest") == null) {
+            User guest = new User();
+            guest.setUsername("Guest");
+            uRepo.save(guest);
+        }
+        if (upwRepository.findByUnContaining("Alex Andrade").isEmpty()) {
+            Upw alexUpw = new Upw();
+            alexUpw.setUn("Alex Andrade");
+            alexUpw.setPw("AlexDemo!");
+            upwRepository.save(alexUpw);
+            User alex = new User();
+            alex.setUsername("Alex Andrade");
+            uRepo.save(alex);
+        }
+        if (upwRepository.findByUnContaining("I-Yang Chen").isEmpty()) {
+            Upw iYangUpw = new Upw();
+            iYangUpw.setUn("I-Yang Chen");
+            iYangUpw.setPw("I-YangDemo!");
+            upwRepository.save(iYangUpw);
+            User iYang = new User();
+            iYang.setUsername("I-Yang Chen");
+            uRepo.save(iYang);
+        }
+        
+        //THIS DOESN'T WORK CORRECTLY YET, AND WILL LOG IN AS GUEST
+        //log in Alex automatically
+        authToken = login("Alex Andrade", "AlexDemo!");
+        int decrypted = SecurityTest.decrypt(authToken);
+        if (decrypted != -1) {
+            loggedIn = uRepo.findByUsername(upwRepository.findById(decrypted).get().getUn());
+        }
+        //If authentication fails, guest.
+        else {
+            loggedIn = uRepo.findByUsername("Guest");
+        }
     	
     	issues = new ArrayList<Long>();
         //Do the same lambda here, so issues will contain all the IDs.
         iRepo.findAll().forEach(issue -> issues.add(issue.getIssueId()));
 
     	comments = new ArrayList<Comment>();
-    	
-    	// User "logged in"
-    	loggedIn = uRepo.findById(users.get(0));
     	
         /**
          * UI - Side Menu
@@ -508,7 +555,7 @@ public class MainUI extends UI {
                     }
                 }
                 else {
-                    ownerId = loggedIn.get().getUserId();
+                    ownerId = loggedIn.getUserId();
                 }
                 if (!assigneeText.isEmpty()) {
                     assigneeSearch = uRepo.findByUsernameContaining(assigneeText.getValue());
@@ -529,7 +576,7 @@ public class MainUI extends UI {
                     }
                 }
                 else {
-                    assigneeId = loggedIn.get().getUserId();
+                    assigneeId = loggedIn.getUserId();
                 }
                 //Find the project issue counter.
                 for (int i=0; i<projects.size(); i++) {
