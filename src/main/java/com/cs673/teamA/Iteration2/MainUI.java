@@ -267,6 +267,7 @@ public class MainUI extends UI {
             });
 
             issueTicketRight.addComponent(editIssueButton);
+            issueTicketRight.addComponent(deleteIssueButton);
             issueTicketRight.addComponent(commentIcon);
             //Add components to the customized ticket layout.
             ticket.addComponent(openedIcon, "resolved");
