@@ -182,7 +182,7 @@ public class MainUI extends UI {
                 //Make empty pop up view for creating new issue ticket.
                 makeIssuePopupView("", "", "", "");
                 //Calling issue popup view, but not querying the database.
-                selectedIssue = null;
+                selectedIssue = Long.MIN_VALUE;
                 popupNewIssue.setPopupVisible(true);
             }
         });
@@ -510,7 +510,7 @@ public class MainUI extends UI {
 
                 } */
                 //Decide create new or edit old according to the value of selectedIssue.
-                if (selectedIssue == null) {
+                if (selectedIssue == Long.MIN_VALUE) {
                     //Add a new ticket to the database.
                     IssueTicket newIssue = new IssueTicket();
                     newIssue.setName(issueTitleText.getValue());
