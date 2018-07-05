@@ -68,10 +68,14 @@ public class MainUI extends UI {
     private final int MAX_ISSUES_NUM = 25;
     private final int MAX_COMMENTS_NUM = 100;
     
+    //Other layout that may be changed real time.
+    private CustomLayout mainPanelLayout;
+
     //This is the rootRootLayout for adding pop up window.
     private AbsoluteLayout rootRootLayout;
     private PopupView popupNewIssue;
     private PopupView popupNewComment;
+    private PopupView popLoginView;
 
     //Pop up window UI for CRUD on issue tickets.
     //Easier to control UI components when they are global variables in this MainUI class.
@@ -81,6 +85,12 @@ public class MainUI extends UI {
     private TextField assigneeText;
     private TextField ownerText;
     private Button addIssueButton;
+
+    //Pop up view for login.
+    VerticalLayout popLoginLayout;
+    TextField popLoginUser;
+    TextField popLoginPwd;
+    Button popLoginBtn;
 
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = MainUI.class)
@@ -275,6 +285,48 @@ public class MainUI extends UI {
         assigneeText.setValue(assignee);
         ownerText.setValue(owner);
     }
+
+    private void makeHeaderLayout(boolean isLogin, String userName) {
+        HorizontalLayout headerLayout = new HorizontalLayout();
+        Button pmBtn = new Button("Project Management Tool");
+        pmBtn.setHeight(65, Unit.PIXELS);
+        pmBtn.addStyleName("headerButton");
+
+        Button chatBtn = new Button("Communication Tool");
+        chatBtn.setHeight(65, Unit.PIXELS);
+        chatBtn.addStyleName("headerButton");
+        
+        // Need to change this label after user is login.
+        Label loginInfo = new Label("Hello " + userName);
+
+        Button loginBtn = new Button("Login");
+        //issueTitle.setIconAlternateText(tempIssueName);
+        loginBtn.addStyleName("titleOnClick");
+        loginBtn.addClickListener(new Button.ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                //Show the login popup view.
+                popLoginView.setPopupVisible(true);
+            }
+        });
+
+        headerLayout.addComponent(pmBtn);
+        headerLayout.setComponentAlignment(pmBtn, Alignment.MIDDLE_RIGHT);
+        headerLayout.addComponent(chatBtn);
+        headerLayout.setComponentAlignment(chatBtn, Alignment.MIDDLE_RIGHT);
+
+        if (isLogin == true) {
+            //TODO: Need to do log out button as well.
+            headerLayout.addComponent(loginInfo);
+            headerLayout.setComponentAlignment(loginInfo, Alignment.MIDDLE_RIGHT);
+        } else {
+            //This is changed after user login.
+            headerLayout.addComponent(loginBtn);
+            headerLayout.setComponentAlignment(loginBtn, Alignment.MIDDLE_RIGHT);
+        }
+        
+        //reload the header layout in the mainPanelLayout.
+        mainPanelLayout.addComponent(headerLayout, "header");
+    }
         
     @Override
     protected void init(VaadinRequest request) {
@@ -374,43 +426,12 @@ public class MainUI extends UI {
         /**
          * UI - Main Page 
          */
-
-        CustomLayout mainPanelLayout = new CustomLayout("main_panel_layout");
+        mainPanelLayout = new CustomLayout("main_panel_layout");
 
         /**
          * UI - Header 
-         *
-         * TODOs:
-         * (1) When click on "Project Management Tool" button, navigate to that page.
-         * (2) When click on "Communication Tool" button, navigate to that page.
-         * (3) When click on "User Profile" icon, show user profile, status, settings, etc.
          */
-        Button pmBtn = new Button("Project Management Tool");
-        pmBtn.setHeight(65, Unit.PIXELS);
-        pmBtn.addStyleName("headerButton");
-
-        Button chatBtn = new Button("Communication Tool");
-        chatBtn.setHeight(65, Unit.PIXELS);
-        chatBtn.addStyleName("headerButton");
-        
-        Label userLabel = new Label("Hello, " + loggedIn.get().getUsername());
-
-        String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-        FileResource resource = new FileResource(new File(basepath + "/WEB-INF/images/user.png"));
-        Image profileIcon = new Image("", resource);
-        profileIcon.setHeight(100, Unit.PIXELS);
-
-        HorizontalLayout headerLayout = new HorizontalLayout();
-        headerLayout.addComponent(pmBtn);
-        headerLayout.setComponentAlignment(pmBtn, Alignment.MIDDLE_RIGHT);
-        headerLayout.addComponent(chatBtn);
-        headerLayout.setComponentAlignment(chatBtn, Alignment.MIDDLE_RIGHT);
-        headerLayout.addComponent(userLabel);
-        headerLayout.setComponentAlignment(userLabel, Alignment.MIDDLE_RIGHT);
-        headerLayout.addComponent(profileIcon);
-        headerLayout.setComponentAlignment(profileIcon, Alignment.MIDDLE_RIGHT);
-        mainPanelLayout.addComponent(headerLayout, "header");
-
+        makeHeaderLayout(false, null);
         
         //Define the fixed size operation panel here. 
         this.mainPanel = new Panel();
@@ -577,10 +598,34 @@ public class MainUI extends UI {
         popupNewComment = new PopupView(null, popupContent2);
         popupNewComment.setHideOnMouseOut(false);
 
+        // Popup View for Log in.
+        VerticalLayout popLoginLayout = new VerticalLayout();
+        popLoginLayout.setSizeFull();
+        TextField popLoginUser = new TextField("User Name");
+        TextField popLoginPwd = new TextField("Password");
+        Button popLoginBtn = new Button("Login");
+        popLoginBtn.addClickListener(new Button.ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                //ToDo: use the user name and password to login.
+                Notification.show(popLoginUser.getValue(), " want to login.", Notification.Type.ERROR_MESSAGE);
+                popLoginView.setPopupVisible(false);
+                //login successfully, make new header layout.
+                makeHeaderLayout(true, "Alex");
+            }
+        });
+        popLoginLayout.addComponent(popLoginUser);
+        popLoginLayout.addComponent(popLoginPwd);
+        popLoginLayout.addComponent(popLoginBtn);
+        popLoginLayout.setComponentAlignment(popLoginBtn, Alignment.MIDDLE_CENTER);
+        // The component itself
+        popLoginView = new PopupView(null, popLoginLayout);
+        popLoginView.setHideOnMouseOut(false);
+
         rootRootLayout = new AbsoluteLayout();
         rootRootLayout.addComponent(rootLayout);
         rootRootLayout.addComponent(popupNewIssue, "left: 50%; top: 50%;");
         rootRootLayout.addComponent(popupNewComment, "left: 50%; top: 50%;");
+        rootRootLayout.addComponent(popLoginView, "left: 50%; top: 50%;");
         setContent(rootRootLayout);  
     }
 }
