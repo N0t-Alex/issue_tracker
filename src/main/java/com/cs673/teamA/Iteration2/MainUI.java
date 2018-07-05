@@ -123,8 +123,19 @@ public class MainUI extends UI {
                 popupNewComment.setPopupVisible(true);
             }
         });
+        //Add a refresh button for "close to" real time user experience.
+        Button refreshComment = new Button("Refresh");
+        refreshComment.addClickListener(new Button.ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                //reload comment page.
+                loadIssueComments(selectedIssue);
+            }
+        });
         commentsRoot.addComponent(addComment);
         commentsRoot.setComponentAlignment(addComment, Alignment.MIDDLE_CENTER);
+        //Add the refresh button to the right.
+        commentsRoot.addComponent(refreshComment);
+        commentsRoot.setComponentAlignment(refreshComment, Alignment.MIDDLE_RIGHT);
         commentsBoardContent.addComponent(commentsRoot, "commentsRoot");
         commentsBoardContent.addComponent(issueName, "title");
         commentsBoardContent.addComponent(issueInfo, "info");
