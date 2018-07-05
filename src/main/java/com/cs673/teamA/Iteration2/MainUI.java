@@ -242,7 +242,9 @@ public class MainUI extends UI {
             Button editIssueButton = new Button("Edit");
             editIssueButton.addClickListener(new Button.ClickListener() {
                 public void buttonClick(ClickEvent event) {
-                    //Pop up a window for editing issue information.
+                    //Pop up a window for editing issue information, show issue data in blanks.
+                    //ToDo: assignee and owner is not connected to login yet.
+                    makeIssuePopupView(issue.getName(), issue.getDescription(), "", "");
                     popupNewIssue.setPopupVisible(true);
                 }
             });
