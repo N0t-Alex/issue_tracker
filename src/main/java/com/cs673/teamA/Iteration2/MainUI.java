@@ -162,12 +162,6 @@ public class MainUI extends UI {
         this.mainPanel.setContent(commentsBoardContent);
     }
     
-    /*
-     * TODOs:
-     * (1) Edit issue tickets button.
-     * (2) Add issue tickets button.
-     * (3) Control tickets number displayed.
-     */
     private void loadIssueTickets(Long projectId) {
         //Issue Tickets filter
         TextField issueFilter;
@@ -240,6 +234,7 @@ public class MainUI extends UI {
                     loadIssueComments(issue.getIssueId());
                 }
             });
+
             //Layout for issue status, owner and assignee.
             HorizontalLayout issueInfo = new HorizontalLayout();
             Label issueStatus = new Label(issue.getDescription());
@@ -250,7 +245,7 @@ public class MainUI extends UI {
             issueInfo.addComponent(issueAssignee);
             issueStatus.addStyleName("myIssueStatus");
             //Layout for edit issue button and comment icon.
-            HorizontalLayout editIssueAndCommentIcon = new HorizontalLayout();
+            HorizontalLayout issueTicketRight = new HorizontalLayout();
             Button editIssueButton = new Button("Edit");
             editIssueButton.addClickListener(new Button.ClickListener() {
                 public void buttonClick(ClickEvent event) {
@@ -262,13 +257,22 @@ public class MainUI extends UI {
                     popIssueView.setPopupVisible(true);
                 }
             });
-            editIssueAndCommentIcon.addComponent(editIssueButton);
-            editIssueAndCommentIcon.addComponent(commentIcon);
+            //Delete issue by issue id.
+            Button deleteIssueButton = new Button("Delete");
+            deleteIssueButton.addClickListener(new Button.ClickListener() {
+                public void buttonClick(ClickEvent event) {
+                    iRepo.deleteById(issue.getIssueId());
+                    loadIssueTickets(selectedProject);
+                }
+            });
+
+            issueTicketRight.addComponent(editIssueButton);
+            issueTicketRight.addComponent(commentIcon);
             //Add components to the customized ticket layout.
             ticket.addComponent(openedIcon, "resolved");
             ticket.addComponent(issueTitle, "issueTitle");
             ticket.addComponent(issueInfo, "issueStatus");
-            ticket.addComponent(editIssueAndCommentIcon, "commentIcon");
+            ticket.addComponent(issueTicketRight, "commentIcon");
             ticket.addComponent(commentNum, "commentNum");
             
             issueTicketsBoard.addComponent(ticket);
