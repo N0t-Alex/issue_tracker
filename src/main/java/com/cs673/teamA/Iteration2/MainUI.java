@@ -135,7 +135,7 @@ public class MainUI extends UI {
         commentsRoot.setComponentAlignment(addComment, Alignment.MIDDLE_CENTER);
         //Add the refresh button to the right.
         commentsRoot.addComponent(refreshComment);
-        commentsRoot.setComponentAlignment(refreshComment, Alignment.MIDDLE_RIGHT);
+        commentsRoot.setComponentAlignment(refreshComment, Alignment.MIDDLE_CENTER);
         commentsBoardContent.addComponent(commentsRoot, "commentsRoot");
         commentsBoardContent.addComponent(issueName, "title");
         commentsBoardContent.addComponent(issueInfo, "info");
@@ -204,6 +204,7 @@ public class MainUI extends UI {
             Label commentNum = new Label("9");
 
             String tempIssueName = issue.getName();
+            // Create customized issue tickets.
             CustomLayout ticket = new CustomLayout("issue_ticket");
             Button issueTitle = new Button(tempIssueName);
             issueTitle.setIconAlternateText(tempIssueName);
@@ -215,6 +216,7 @@ public class MainUI extends UI {
                     loadIssueComments(issue.getIssueId());
                 }
             });
+            //Layout for issue status, owner and assignee.
             HorizontalLayout issueInfo = new HorizontalLayout();
             Label issueStatus = new Label(issue.getDescription());
             Label issueOwner = new Label("Owner: " + uRepo.findById(issue.getOwnerId()).get().getUsername());
@@ -223,10 +225,22 @@ public class MainUI extends UI {
             issueInfo.addComponent(issueOwner);
             issueInfo.addComponent(issueAssignee);
             issueStatus.addStyleName("myIssueStatus");
+            //Layout for edit issue button and comment icon.
+            HorizontalLayout editIssueAndCommentIcon = new HorizontalLayout();
+            Button editIssueButton = new Button("Edit");
+            editIssueButton.addClickListener(new Button.ClickListener() {
+                public void buttonClick(ClickEvent event) {
+                    //Pop up a window for editing issue information.
+                    popupNewIssue.setPopupVisible(true);
+                }
+            });
+            editIssueAndCommentIcon.addComponent(editIssueButton);
+            editIssueAndCommentIcon.addComponent(commentIcon);
+            //Add components to the customized ticket layout.
             ticket.addComponent(openedIcon, "resolved");
             ticket.addComponent(issueTitle, "issueTitle");
             ticket.addComponent(issueInfo, "issueStatus");
-            ticket.addComponent(commentIcon, "commentIcon");
+            ticket.addComponent(editIssueAndCommentIcon, "commentIcon");
             ticket.addComponent(commentNum, "commentNum");
             
             issueTicketsBoard.addComponent(ticket);
@@ -509,27 +523,8 @@ public class MainUI extends UI {
                 //Add the ticket to the database.
                 Comment newComment = new Comment();
                 newComment.setContent(commentContentText.getValue());
-                //newComment.setCommentID(1); 
                 newComment.setIssueId(selectedIssue);
-                //IssueTicket issue = iRepo.findById(selectedIssue).get();
-                //Notification.show(issue.getName(), "'s comment created.",
-                 // Notification.Type.HUMANIZED_MESSAGE);
-                //newComment.setPosterID(1);
-                //newComment.setDateModified();
                 cRepo.save(newComment);
-                /*
-                IssueTicket newIssue = new IssueTicket();
-                newIssue.setName(issueTitleText.getValue());
-                newIssue.setDescription(issueContentText.getValue());
-                newIssue.setAssigneeId(assigneeId);
-                newIssue.setOwnerId(ownerId);
-                newIssue.setDateCreated(new Date());
-                newIssue.setResolved(false);
-                newIssue.setProjectId(selectedProject);
-                iRepo.save(newIssue); 
-                */
-                //Notification.show("Comment created.",
-                 // Notification.Type.HUMANIZED_MESSAGE);
                 popupNewComment.setPopupVisible(false);
 
                 //Reload the comment board.
