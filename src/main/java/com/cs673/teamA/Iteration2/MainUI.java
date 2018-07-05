@@ -28,6 +28,7 @@ import com.vaadin.ui.Image;
 import java.util.*;
 import com.vaadin.ui.TextArea;
 import com.vaadin.server.Sizeable.Unit;
+import com.vaadin.ui.PasswordField;
 
 
 @Theme("mytheme")
@@ -524,13 +525,25 @@ public class MainUI extends UI {
         addIssueButton = new Button("Ok");
         addIssueButton.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
-                //Check that the issue has a title first.
+                //Check that the issue's title meets requirements.
                 if (issueTitleText.isEmpty()) {
                     Notification.show("Issue must have a title.", Notification.Type.ERROR_MESSAGE);
                     return;
                 }
+                else if (issueTitleText.getValue().length() > MAX_STRING_LENGTH) {
+                    Notification.show("Your issue title must contain 255 characters or fewer.", Notification.Type.ERROR_MESSAGE);
+                    return;
+                }
+                
+                //Check that the issue's description meets length requirement.
+                //Description can be empty.
+                if (issueTitleText.getValue().length() > MAX_STRING_LENGTH) {
+                    Notification.show("Your issue description must contain 255 characters or fewer.", Notification.Type.ERROR_MESSAGE);
+                    return;
+                }
                 
                 //Search the database for users containing the entered values for owner and assignee.
+                //ToDo: Owner and assignee are empty for now.
                 List<User> ownerSearch;
                 List<User> assigneeSearch;
                 Long ownerId = null;
@@ -632,6 +645,16 @@ public class MainUI extends UI {
         Button addCommentButton = new Button("Add");
         addCommentButton.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
+                //Check that the issue's comment meets requirements.
+                if (commentContentText.isEmpty()) {
+                    Notification.show("No comment entered.", Notification.Type.ERROR_MESSAGE);
+                    return;
+                }
+                else if (commentContentText.getValue().length() > MAX_STRING_LENGTH) {
+                    Notification.show("Your comment must contain 255 characters or fewer.", Notification.Type.ERROR_MESSAGE);
+                    return;
+                }
+
                 //Add the ticket to the database.
                 Comment newComment = new Comment();
                 newComment.setContent(commentContentText.getValue());
@@ -654,15 +677,33 @@ public class MainUI extends UI {
         VerticalLayout popLoginLayout = new VerticalLayout();
         popLoginLayout.setSizeFull();
         TextField popLoginUser = new TextField("User Name");
-        TextField popLoginPwd = new TextField("Password");
+        PasswordField popLoginPwd = new PasswordField("Password");
         Button popLoginBtn = new Button("Login");
         popLoginBtn.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
+                //Check that the login input.
+                if (popLoginUser.isEmpty()) {
+                    Notification.show("No User Name entered.", Notification.Type.ERROR_MESSAGE);
+                    return;
+                }
+                else if (popLoginUser.getValue().length() > MAX_STRING_LENGTH) {
+                    Notification.show("User Name must contain 255 characters or fewer.", Notification.Type.ERROR_MESSAGE);
+                    return;
+                }
+                //Check that the login input.
+                if (popLoginPwd.isEmpty()) {
+                    Notification.show("No Password entered.", Notification.Type.ERROR_MESSAGE);
+                    return;
+                }
+                else if (popLoginPwd.getValue().length() > MAX_STRING_LENGTH) {
+                    Notification.show("Password must contain 255 characters or fewer.", Notification.Type.ERROR_MESSAGE);
+                    return;
+                }
                 //ToDo: use the user name and password to login.
-                Notification.show(popLoginUser.getValue(), " want to login.", Notification.Type.ERROR_MESSAGE);
+                Notification.show("Login not implemented, login as guest.", Notification.Type.ERROR_MESSAGE);
                 popLoginView.setPopupVisible(false);
                 //login successfully, make new header layout.
-                makeHeaderLayout(true, "Alex");
+                makeHeaderLayout(true, "Guest");
             }
         });
         popLoginLayout.addComponent(popLoginUser);
