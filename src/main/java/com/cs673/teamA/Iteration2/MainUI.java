@@ -448,7 +448,7 @@ public class MainUI extends UI {
         assigneeText.setWidth(300, Unit.PIXELS);
         ownerText = new TextField("Owner");
         ownerText.setWidth(300, Unit.PIXELS);
-        addIssueButton = new Button("Add");
+        addIssueButton = new Button("Ok");
         addIssueButton.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
                 //Check that the issue has a title first.
@@ -531,6 +531,9 @@ public class MainUI extends UI {
                     editIssue.setName(issueTitleText.getValue());
                     editIssue.setDescription(issueContentText.getValue());
                     iRepo.save(editIssue);
+                    Notification.show(issueTitleText.getValue(), "is edited.",
+                      Notification.Type.HUMANIZED_MESSAGE);
+                    popupNewIssue.setPopupVisible(false);
                 }
 
                 //Reload the issue page.
