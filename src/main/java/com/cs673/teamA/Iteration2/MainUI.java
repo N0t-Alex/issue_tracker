@@ -233,13 +233,43 @@ public class MainUI extends UI {
             IssueTicket issue = iRepo.findById(issues.get(i)).get();
             // Get the opened icon from resource.
             String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-            FileResource resource = new FileResource(new File(basepath + "/WEB-INF/images/opened.png"));
-            Image openedIcon = new Image("", resource);
-            openedIcon.setHeight(25, Unit.PIXELS);
+            FileResource openRsrc = new FileResource(new File(basepath + "/WEB-INF/images/opened.png"));
+            FileResource closedRsrc = new FileResource(new File(basepath + "/WEB-INF/images/closed.png"));
+            //Check if this issue ticket is resolved.
+            Button resolvedBtn = new Button();
+            resolvedBtn.setHeight(35, Unit.PIXELS);
+            resolvedBtn.setWidth(35, Unit.PIXELS);
+            if (issue.isResolved()) {
+                //Use closed icon.
+                resolvedBtn.setIcon(closedRsrc);
+                resolvedBtn.addClickListener(new Button.ClickListener() {
+                    public void buttonClick(ClickEvent event) {
+                        //Change iRepo data of this issue's isResolved(), and reload issue tickets.
+                        issue.setResolved(false);
+                        iRepo.save(issue);
+                        loadIssueTickets(selectedProject);
+                    }
+                });
+            } else {
+                //Use open icon.
+                resolvedBtn.setIcon(openRsrc);
+                resolvedBtn.addClickListener(new Button.ClickListener() {
+                    public void buttonClick(ClickEvent event) {
+                        //Change iRepo data of this issue's isResolved(), and reload issue tickets.
+                        issue.setResolved(true);
+                        iRepo.save(issue);
+                        loadIssueTickets(selectedProject);
+                    }
+                });
+            }
+
+            //D-D: FileResource resource = new FileResource(new File(basepath + "/WEB-INF/images/opened.png"));
+            //Image openedIcon = new Image("", resource);
+            //openedIcon.setHeight(25, Unit.PIXELS);
 
             // Get the comment icon from resource.
-            basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-            resource = new FileResource(new File(basepath + "/WEB-INF/images/comment.png"));
+            //D-D: basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+            FileResource resource = new FileResource(new File(basepath + "/WEB-INF/images/comment.png"));
             Image commentIcon = new Image("", resource);
             commentIcon.setHeight(20, Unit.PIXELS);
             Label commentNum = new Label("9");
@@ -294,7 +324,7 @@ public class MainUI extends UI {
             issueTicketRight.addComponent(deleteIssueButton);
             issueTicketRight.addComponent(commentIcon);
             //Add components to the customized ticket layout.
-            ticket.addComponent(openedIcon, "resolved");
+            ticket.addComponent(resolvedBtn, "resolved");
             ticket.addComponent(issueTitle, "issueTitle");
             ticket.addComponent(issueInfo, "issueStatus");
             ticket.addComponent(issueTicketRight, "commentIcon");
