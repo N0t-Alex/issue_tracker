@@ -394,23 +394,11 @@ public class MainUI extends UI {
         if (!pRepo.findAll().iterator().hasNext()) {
             //Not keep creating dummy projects
             Project projA = new Project();
-            projA.setProjectName("Project A");
+            projA.setProjectName("CS673 Class Project");
             pRepo.save(projA);
             Project projB = new Project();
-            projB.setProjectName("Project B");
+            projB.setProjectName("Other Topic");
             pRepo.save(projB);
-            Project projC = new Project();
-            projC.setProjectName("Project C");
-            pRepo.save(projC);
-            Project projX = new Project();
-            projX.setProjectName("Project X");
-            pRepo.save(projX);
-            Project projY = new Project();
-            projY.setProjectName("Project Y");
-            pRepo.save(projY);
-            Project projZ = new Project();
-            projZ.setProjectName("Project Z");
-            pRepo.save(projZ);
         }
     	
     	projects = new ArrayList<Long>();
