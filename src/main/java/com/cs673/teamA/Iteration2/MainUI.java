@@ -359,7 +359,7 @@ public class MainUI extends UI {
         
     @Override
     protected void init(VaadinRequest request) {
-        if (!pRepo.findAll().iterator().hasNext()) {
+        
             //Not keep creating dummy projects
             Project projA = new Project();
             projA.setProjectName("Project A");
@@ -379,7 +379,7 @@ public class MainUI extends UI {
             Project projZ = new Project();
             projZ.setProjectName("Project Z");
             pRepo.save(projZ);
-        }
+        
     	
     	projects = new ArrayList<Long>();
     	pRepo.findAll().forEach(project -> projects.add(project.getProjectId()));
