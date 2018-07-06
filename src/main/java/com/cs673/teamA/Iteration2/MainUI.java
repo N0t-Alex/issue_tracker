@@ -237,11 +237,12 @@ public class MainUI extends UI {
             FileResource closedRsrc = new FileResource(new File(basepath + "/WEB-INF/images/closed.png"));
             //Check if this issue ticket is resolved.
             Button resolvedBtn = new Button();
-            resolvedBtn.setHeight(35, Unit.PIXELS);
-            resolvedBtn.setWidth(35, Unit.PIXELS);
+            resolvedBtn.setHeight(25, Unit.PIXELS);
+            resolvedBtn.setWidth(25, Unit.PIXELS);
             if (issue.isResolved()) {
                 //Use closed icon.
                 resolvedBtn.setIcon(closedRsrc);
+                resolvedBtn.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
                 resolvedBtn.addClickListener(new Button.ClickListener() {
                     public void buttonClick(ClickEvent event) {
                         //Change iRepo data of this issue's isResolved(), and reload issue tickets.
@@ -253,6 +254,7 @@ public class MainUI extends UI {
             } else {
                 //Use open icon.
                 resolvedBtn.setIcon(openRsrc);
+                resolvedBtn.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
                 resolvedBtn.addClickListener(new Button.ClickListener() {
                     public void buttonClick(ClickEvent event) {
                         //Change iRepo data of this issue's isResolved(), and reload issue tickets.
