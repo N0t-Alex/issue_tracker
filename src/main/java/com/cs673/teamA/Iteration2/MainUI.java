@@ -359,25 +359,27 @@ public class MainUI extends UI {
         
     @Override
     protected void init(VaadinRequest request) {
-        //Dummy projects
-    	Project projA = new Project();
-    	projA.setProjectName("Project A");
-    	pRepo.save(projA);
-    	Project projB = new Project();
-    	projB.setProjectName("Project B");
-    	pRepo.save(projB);
-    	Project projC = new Project();
-    	projC.setProjectName("Project C");
-    	pRepo.save(projC);
-    	Project projX = new Project();
-    	projX.setProjectName("Project X");
-    	pRepo.save(projX);
-    	Project projY = new Project();
-    	projY.setProjectName("Project Y");
-    	pRepo.save(projY);
-    	Project projZ = new Project();
-    	projZ.setProjectName("Project Z");
-    	pRepo.save(projZ);
+        if (!pRepo.findAll().iterator().hasNext()) {
+            //Not keep creating dummy projects
+            Project projA = new Project();
+            projA.setProjectName("Project A");
+            pRepo.save(projA);
+            Project projB = new Project();
+            projB.setProjectName("Project B");
+            pRepo.save(projB);
+            Project projC = new Project();
+            projC.setProjectName("Project C");
+            pRepo.save(projC);
+            Project projX = new Project();
+            projX.setProjectName("Project X");
+            pRepo.save(projX);
+            Project projY = new Project();
+            projY.setProjectName("Project Y");
+            pRepo.save(projY);
+            Project projZ = new Project();
+            projZ.setProjectName("Project Z");
+            pRepo.save(projZ);
+        }
     	
     	projects = new ArrayList<Long>();
     	pRepo.findAll().forEach(project -> projects.add(project.getProjectId()));
