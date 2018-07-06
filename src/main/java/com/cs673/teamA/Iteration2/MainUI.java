@@ -261,13 +261,13 @@ public class MainUI extends UI {
 
             //Layout for issue status, owner and assignee.
             HorizontalLayout issueInfo = new HorizontalLayout();
-            Label issueStatus = new Label(issue.getDescription());
+            //Label issueStatus = new Label(issue.getDescription());
             Label issueOwner = new Label("Owner: " + uRepo.findById(issue.getOwnerId()).get().getUsername());
             Label issueAssignee = new Label("Assignee: " + uRepo.findById(issue.getAssigneeId()).get().getUsername());
-            issueInfo.addComponent(issueStatus);
+            //issueInfo.addComponent(issueStatus);
             issueInfo.addComponent(issueOwner);
             issueInfo.addComponent(issueAssignee);
-            issueStatus.addStyleName("myIssueStatus");
+            //issueStatus.addStyleName("myIssueStatus");
             //Layout for edit issue button and comment icon.
             HorizontalLayout issueTicketRight = new HorizontalLayout();
             Button editIssueButton = new Button("Edit");
