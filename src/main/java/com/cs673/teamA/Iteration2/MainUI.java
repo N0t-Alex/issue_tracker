@@ -1,6 +1,7 @@
 package com.cs673.teamA.Iteration2;
 
 import javax.servlet.annotation.WebServlet;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.annotations.Theme;
@@ -27,7 +28,6 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Image;
 import java.util.*;
 import com.vaadin.ui.TextArea;
-import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.PasswordField;
 
 
@@ -53,7 +53,7 @@ public class MainUI extends UI {
   	private ProjectRepository pRepo;
   	
   	@Autowired
-  	private UserRepository uRepo;
+  	private UserProfileRepository uRepo;
 
     //!!!!!!!!!!!!!!!!!!!!THIS IS NEW!!!!!!!!!!!!!!!!!
     @Autowired
@@ -62,20 +62,17 @@ public class MainUI extends UI {
   	private List<Long> issues;
   	private List<Long> projects;
   	private Long selectedProject;
-    //Search all the issue comments.
     private Long selectedIssue;
-  	private List<Long> users;
   	private List<Comment> comments;
     //!!!!!!!!!!!!MORE NEW!!!!!!!!!!!
     private String authToken;
-    private User loggedIn;
+    private UserProfile loggedIn;
     //END NEW
     
     //Define max display of dynamically added components.
     private final int MAX_PROJECTS_NUM = 5;
     private final int MAX_ISSUES_NUM = 25;
     private final int MAX_COMMENTS_NUM = 100;
-    //!!!!!!!!!!!!!!!!!NEW!!!!!!!!!!!!!!!
     private final int MAX_STRING_LENGTH = 255;
     
     //Other layout that may be changed real time.
@@ -94,6 +91,7 @@ public class MainUI extends UI {
     private TextArea issueContentText;
     private TextField assigneeText;
     private TextField ownerText;
+    private TextArea commentContentText;
     private Button addIssueButton;
 
     //Pop up view for login.
@@ -107,7 +105,6 @@ public class MainUI extends UI {
     public static class Servlet extends VaadinServlet {
     }
 
-    //!!!!!!!!!!!!!!!!!!!!NEW!!!!!!!!!!!!!!!!!!!!!!!
     //Login functionality for authentication
     public String login(String un, String pw) {
         Upw u = upwRepository.findByUnAndPw(un,pw);
@@ -119,7 +116,6 @@ public class MainUI extends UI {
         }
     }
 
-    //!!!!!!!!!INCLUDE LOGIC FOR CLEARING COMMENTS!!!!!!!!!!!!!1
     private void loadIssueComments(Long issueId) {
     	IssueTicket issue = iRepo.findById(issueId).get();
         if (!comments.isEmpty()) {
@@ -163,6 +159,7 @@ public class MainUI extends UI {
         Button addComment = new Button("Add Comment");
         addComment.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
+            	commentContentText.setValue("");
                 popCommentView.setPopupVisible(true);
             }
         });
@@ -187,6 +184,9 @@ public class MainUI extends UI {
     }
     
     private void loadIssueTickets(Long projectId) {
+    	loadIssueTickets(projectId, "");
+    }
+    private void loadIssueTickets(Long projectId, String filterText) {
         //Issue Tickets filter
         TextField issueFilter;
         Button issueFilterBtn;
@@ -196,6 +196,11 @@ public class MainUI extends UI {
         issueFilter = new TextField();
         issueFilter.setPlaceholder("Issue Title");
         issueFilterBtn = new Button("Search");
+        issueFilterBtn.addClickListener(new Button.ClickListener() {
+        	public void buttonClick(ClickEvent event) {
+        		loadIssueTickets(projectId, issueFilter.getValue());
+        	}
+        });
         mainPanelContent.setHeightUndefined();
         HorizontalLayout issueFilterLayout = new HorizontalLayout();
         issueFilterLayout.addComponent(issueFilterBtn);
@@ -224,7 +229,16 @@ public class MainUI extends UI {
         	issues.clear();
         }
     	iRepo.findByProjectId(projectId).forEach(issue -> issues.add(issue.getIssueId()));
-        
+    	//filter
+    	if (!filterText.equals("")) {
+    		List<IssueTicket> removable = (List<IssueTicket>) iRepo.findAllById(issues);
+    		for (IssueTicket issue : removable) {
+    			if (!issue.getName().contains(filterText)) {
+    				issues.remove(issue.getIssueId());
+    			}
+    		}
+    	}
+    	
         for (int i=0; i<MAX_ISSUES_NUM; i++) {
         	
             if (i == issues.size()) {
@@ -307,7 +321,7 @@ public class MainUI extends UI {
                 public void buttonClick(ClickEvent event) {
                     //Pop up a window for editing issue information, show issue data in blanks.
                     //ToDo: assignee and owner is not connected to login yet.
-                    makeIssuePopupView(issue.getName(), issue.getDescription(), "", "");
+                    makeIssuePopupView(issue.getName(), issue.getDescription(), uRepo.findById(issue.getAssigneeId()).get().getUsername(), uRepo.findById(issue.getOwnerId()).get().getUsername());
                     //Use the issue ID to query the database.
                     selectedIssue = issue.getIssueId();
                     popIssueView.setPopupVisible(true);
@@ -317,6 +331,7 @@ public class MainUI extends UI {
             Button deleteIssueButton = new Button("Delete");
             deleteIssueButton.addClickListener(new Button.ClickListener() {
                 public void buttonClick(ClickEvent event) {
+                	cRepo.findByIssueId(issue.getIssueId()).forEach(comment -> cRepo.deleteById(comment.getCommentId()));
                     iRepo.deleteById(issue.getIssueId());
                     loadIssueTickets(selectedProject);
                 }
@@ -394,32 +409,31 @@ public class MainUI extends UI {
         if (!pRepo.findAll().iterator().hasNext()) {
             //Not keep creating dummy projects
             Project projA = new Project();
-            projA.setProjectName("CS673 Class Project");
+            projA.setProjectname("CS673 Class Project");
             pRepo.save(projA);
             Project projB = new Project();
-            projB.setProjectName("Project B");
+            projB.setProjectname("Project B");
             pRepo.save(projB);
             Project projC = new Project();
-            projC.setProjectName("Project C");
+            projC.setProjectname("Project C");
             pRepo.save(projC);
             Project projX = new Project();
-            projX.setProjectName("Project X");
+            projX.setProjectname("Project X");
             pRepo.save(projX);
             Project projY = new Project();
-            projY.setProjectName("Project Y");
+            projY.setProjectname("Project Y");
             pRepo.save(projY);
             Project projZ = new Project();
-            projZ.setProjectName("Project Z");
+            projZ.setProjectname("Project Z");
             pRepo.save(projZ);
         }
     	
     	projects = new ArrayList<Long>();
-    	pRepo.findAll().forEach(project -> projects.add(project.getProjectId()));
+    	pRepo.findAll().forEach(project -> projects.add(project.getId()));
     	
-    	//THIS PART HAS BEEN CHANGED A LOT FOR LOGIN. PLEASE REPLACE OLD CODE.
         //Demo users
         if (uRepo.findByUsername("Guest") == null) {
-            User guest = new User();
+            UserProfile guest = new UserProfile();
             guest.setUsername("Guest");
             uRepo.save(guest);
         }
@@ -428,7 +442,7 @@ public class MainUI extends UI {
             alexUpw.setUn("Alex Andrade");
             alexUpw.setPw("AlexDemo!");
             upwRepository.save(alexUpw);
-            User alex = new User();
+            UserProfile alex = new UserProfile();
             alex.setUsername("Alex Andrade");
             uRepo.save(alex);
         }
@@ -437,7 +451,7 @@ public class MainUI extends UI {
             iYangUpw.setUn("I-Yang Chen");
             iYangUpw.setPw("I-YangDemo!");
             upwRepository.save(iYangUpw);
-            User iYang = new User();
+            UserProfile iYang = new UserProfile();
             iYang.setUsername("I-Yang Chen");
             uRepo.save(iYang);
         }
@@ -493,13 +507,13 @@ public class MainUI extends UI {
         		break;
         	}
         	Project project = pRepo.findById(projects.get(i)).get();
-            Button temp = new Button(project.getProjectName());
+            Button temp = new Button(project.getProjectname());
             temp.addStyleName("sideMenuButton");
             temp.setWidth(300, Unit.PIXELS);
             temp.setHeight(80, Unit.PIXELS);
             temp.addClickListener(new Button.ClickListener() {
             	public void buttonClick(ClickEvent event) {
-            		selectedProject = project.getProjectId();
+            		selectedProject = project.getId();
             		loadIssueTickets(selectedProject);
             	}
             });
@@ -554,8 +568,10 @@ public class MainUI extends UI {
         issueContentText.setWidth(300, Unit.PIXELS);
         assigneeText = new TextField("Assignee");
         assigneeText.setWidth(300, Unit.PIXELS);
+        assigneeText.setPlaceholder("Default (self)");
         ownerText = new TextField("Owner");
         ownerText.setWidth(300, Unit.PIXELS);
+        ownerText.setPlaceholder("Default (self)");
         addIssueButton = new Button("Ok");
         addIssueButton.addClickListener(new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
@@ -571,21 +587,25 @@ public class MainUI extends UI {
                 
                 //Check that the issue's description meets length requirement.
                 //Description can be empty.
-                if (issueTitleText.getValue().length() > MAX_STRING_LENGTH) {
+                if (issueContentText.getValue().length() > MAX_STRING_LENGTH) {
                     Notification.show("Your issue description must contain 255 characters or fewer.", Notification.Type.ERROR_MESSAGE);
                     return;
                 }
                 
                 //Search the database for users containing the entered values for owner and assignee.
                 //ToDo: Owner and assignee are empty for now.
-                List<User> ownerSearch;
-                List<User> assigneeSearch;
+                List<UserProfile> ownerSearch;
+                List<UserProfile> assigneeSearch;
                 Long ownerId = null;
                 Long assigneeId = null;
                 //ToDo: need to get this wired to the database.
                 if (!ownerText.isEmpty()) {
-                    ownerSearch = uRepo.findByUsernameContaining(ownerText.getValue());
-                    if (ownerSearch.size() == 0) {
+                	if (ownerText.getValue().length() > MAX_STRING_LENGTH) {
+                        Notification.show("The owner's username must contain 255 characters or fewer.", Notification.Type.ERROR_MESSAGE);
+                        return;
+                    }
+                    ownerSearch = uRepo.findByUsernameContainingIgnoreCase(ownerText.getValue());
+                    if (ownerSearch.isEmpty()) {
                         Notification.show("No users found with a username containing " 
                             + ownerText.getValue() + ". Please try a different username.", 
                             Notification.Type.ERROR_MESSAGE);
@@ -605,7 +625,11 @@ public class MainUI extends UI {
                     ownerId = loggedIn.getUserId();
                 }
                 if (!assigneeText.isEmpty()) {
-                    assigneeSearch = uRepo.findByUsernameContaining(assigneeText.getValue());
+                	if (assigneeText.getValue().length() > MAX_STRING_LENGTH) {
+                        Notification.show("The assignee's username must contain 255 characters or fewer.", Notification.Type.ERROR_MESSAGE);
+                        return;
+                    }
+                    assigneeSearch = uRepo.findByUsernameContainingIgnoreCase(assigneeText.getValue());
                     if (assigneeSearch.size() == 0) {
                         Notification.show("No users found with a username containing " 
                             + assigneeText.getValue() + ". Please try a different username.", 
@@ -635,7 +659,6 @@ public class MainUI extends UI {
                     IssueTicket newIssue = new IssueTicket();
                     newIssue.setName(issueTitleText.getValue());
                     newIssue.setDescription(issueContentText.getValue());
-                    //ToDo: code below doesn't do anything for now.
                     newIssue.setAssigneeId(assigneeId);
                     newIssue.setOwnerId(ownerId);
                     newIssue.setDateCreated(new Date());
@@ -650,6 +673,8 @@ public class MainUI extends UI {
                     IssueTicket editIssue = iRepo.findById(selectedIssue).get();
                     editIssue.setName(issueTitleText.getValue());
                     editIssue.setDescription(issueContentText.getValue());
+                    editIssue.setAssigneeId(assigneeId);
+                    editIssue.setOwnerId(ownerId);
                     iRepo.save(editIssue);
                     Notification.show(issueTitleText.getValue(), "is edited.",
                       Notification.Type.HUMANIZED_MESSAGE);
@@ -673,7 +698,7 @@ public class MainUI extends UI {
         // Content for the PopupView of creating new comment.
         VerticalLayout popupContent2 = new VerticalLayout();
         popupContent2.setSizeFull();
-        TextArea commentContentText = new TextArea("Comment Content");
+        commentContentText = new TextArea("Comment Content");
         commentContentText.setHeight(200, Unit.PIXELS);
         commentContentText.setWidth(300, Unit.PIXELS);
         Button addCommentButton = new Button("Add");

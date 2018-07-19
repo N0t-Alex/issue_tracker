@@ -10,38 +10,54 @@ public class Project {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long projectId;
-	private String projectName;
+	private Long id;
+	private String projectname;
+	private Long createuser;
 	
 	public Project() {
 	}
 
 	/**
-	 * @return the projectId
+	 * @return the id
 	 */
-	public Long getProjectId() {
-		return projectId;
+	public Long getId() {
+		return id;
 	}
 
 	/**
-	 * @param projectId the projectId to set
+	 * @param id the id to set
 	 */
-	public void setProjectId(Long projectId) {
-		this.projectId = projectId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	/**
-	 * @return the projectName
+	 * @return the projectname
 	 */
-	public String getProjectName() {
-		return projectName;
+	public String getProjectname() {
+		return projectname;
 	}
 
 	/**
-	 * @param projectName the projectName to set
+	 * @param projectname the projectname to set
 	 */
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
+	public void setProjectname(String projectname) {
+		this.projectname = projectname;
 	}
+
+	/**
+	 * @return the createuser
+	 */
+	public Long getCreateuser() {
+		return createuser;
+	}
+
+	/**
+	 * @param createuser the createuser to set
+	 */
+	public void setCreateuser(Long createuser) {
+		this.createuser = createuser;
+	}
+
 	
 }

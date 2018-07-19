@@ -6,14 +6,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class User {
+public class UserProfile {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long userId;
 	private String username;
 
-	public User() {
+	public UserProfile() {
 		
 	}
 	
